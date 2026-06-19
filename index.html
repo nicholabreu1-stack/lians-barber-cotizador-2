@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lian's Barber Shop - Cotizador Inteligente</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#000000,#4B0082);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.container{
+    background:white;
+    width:100%;
+    max-width:500px;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 0 20px rgba(0,0,0,0.4);
+}
+
+h1{
+    text-align:center;
+    color:#4B0082;
+    margin-bottom:5px;
+}
+
+.subtitulo{
+    text-align:center;
+    color:#555;
+    margin-bottom:20px;
+}
+
+label{
+    font-weight:bold;
+    display:block;
+    margin-top:15px;
+    margin-bottom:5px;
+}
+
+select{
+    width:100%;
+    padding:10px;
+    border:2px solid #4B0082;
+    border-radius:8px;
+}
+
+.extras{
+    margin-top:10px;
+}
+
+.extras label{
+    display:block;
+    font-weight:normal;
+    margin:8px 0;
+}
+
+.resumen{
+    background:#f5f0ff;
+    border-left:5px solid #4B0082;
+    padding:15px;
+    border-radius:8px;
+    margin-top:20px;
+}
+
+.total{
+    font-size:24px;
+    color:#4B0082;
+    font-weight:bold;
+}
+
+.descuento{
+    color:green;
+    font-weight:bold;
+}
+
+button{
+    width:100%;
+    margin-top:15px;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:bold;
+}
+
+.btn-ticket{
+    background:#4B0082;
+    color:white;
+}
+
+.btn-ticket:hover{
+    background:#360061;
+}
+
+.btn-whatsapp{
+    background:#25D366;
+    color:white;
+}
+
+.btn-whatsapp:hover{
+    background:#1da851;
+}
+
+.ticket{
+    margin-top:15px;
+    padding:15px;
+    background:#fafafa;
+    border:1px solid #ddd;
+    border-radius:8px;
+    white-space:pre-line;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>?? Lian's Barber Shop</h1>
+<p class="subtitulo">Cotizador Inteligente</p>
+
+<label>Seleccione un servicio</label>
+
+<select id="servicio" onchange="calcular()">
+<option value="20">Corte Clásico - $20</option>
+<option value="25">Corte + Barba - $25</option>
+<option value="15">Afeitado - $15</option>
+<option value="35">Combo Premium - $35</option>
+</select>
+
+<div class="extras">
+<label>
+<input type="checkbox" id="diseno" onchange="calcular()">
+Diseño Avanzado (+$10)
+</label>
+
+<label>
+<input type="checkbox" id="tratamiento" onchange="calcular()">
+Tratamiento (+$8)
+</label>
+</div>
+
+<div class="resumen">
+<p>Subtotal: $<span id="subtotal">20.00</span></p>
+<p class="descuento">Descuento: $<span id="descuento">0.00</span></p>
+<p class="total">Total: $<span id="total">20.00</span></p>
+</div>
+
+<button class="btn-ticket" onclick="generarTicket()">
+Generar Ticket
+</button>
+
+<button class="btn-whatsapp" onclick="enviarWhatsApp()">
+Enviar por WhatsApp
+</button>
+
+<div id="ticket" class="ticket"></div>
+
+</div>
+
+<script>
+
+let textoTicket = "";
+
+function calcular(){
+
+let subtotal = parseFloat(
+document.getElementById("servicio").value
+);
+
+if(document.getElementById("diseno").checked){
+subtotal += 10;
+}
+
+if(document.getElementById("tratamiento").checked){
+subtotal += 8;
+}
+
+let descuento = 0;
+
+if(subtotal > 45){
+descuento = subtotal * 0.10;
+}
+
+let total = subtotal - descuento;
+
+document.getElementById("subtotal").textContent =
+subtotal.toFixed(2);
+
+document.getElementById("descuento").textContent =
+descuento.toFixed(2);
+
+document.getElementById("total").textContent =
+total.toFixed(2);
+}
+
+function generarTicket(){
+
+const servicio =
+document.getElementById("servicio");
+
+const nombreServicio =
+servicio.options[servicio.selectedIndex].text;
+
+let extras = [];
+
+if(document.getElementById("diseno").checked){
+extras.push("Diseño Avanzado");
+}
+
+if(document.getElementById("tratamiento").checked){
+extras.push("Tratamiento");
+}
+
+const subtotal =
+document.getElementById("subtotal").textContent;
+
+const descuento =
+document.getElementById("descuento").textContent;
+
+const total =
+document.getElementById("total").textContent;
+
+textoTicket =
+`?? LIAN'S BARBER SHOP
+
+Servicio:
+${nombreServicio}
+
+Extras:
+${extras.length > 0 ? extras.join(", ") : "Ninguno"}
+
+Subtotal: $${subtotal}
+Descuento: $${descuento}
+Total a pagar: $${total}
+
+¡Gracias por preferirnos!`;
+
+document.getElementById("ticket").textContent =
+textoTicket;
+}
+
+function enviarWhatsApp(){
+
+if(textoTicket === ""){
+generarTicket();
+}
+
+const mensaje =
+encodeURIComponent(textoTicket);
+
+window.open(
+`https://wa.me/?text=${mensaje}`,
+"_blank"
+);
+}
+
+calcular();
+
+</script>
+
+</body>
+</html>
